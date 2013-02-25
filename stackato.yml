@@ -1,0 +1,5 @@
+name: geoip
+instances: 1
+framework:
+  type: python
+mem: 64
