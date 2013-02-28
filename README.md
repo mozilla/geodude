@@ -27,7 +27,7 @@ their IP address.
 
 ### runserver
 
-**Usage:** `./manage.py runserver [port=8000]
+**Usage:** `./manage.py runserver [port=8000]`
 
 Starts the development server. Optionally takes a port to run on; the default is
 port 8000. Not all that useful, as all local requests will use `127.0.0.1` as
