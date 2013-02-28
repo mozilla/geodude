@@ -1,20 +1,23 @@
 import json
-import os
 
 import pygeoip
 from webob import Request, Response
 
+import settings
 
-geoip = pygeoip.GeoIP(os.path.dirname(os.path.abspath(__file__)) + '/GeoIP.dat', pygeoip.MEMORY_CACHE)
+
+__version__ = '0.1'
+
+
+try:
+    geoip = pygeoip.GeoIP(settings.GEO_DB_PATH, pygeoip.MEMORY_CACHE)
+except IOError, e:
+    if not settings.DEV:
+        raise IOError('Could not load GeoIP database: {0}'.format(e))
 
 
 def application(environ, start_response):
-    """
-    Parse the request and geolocate the user via IP.
-
-    :return:
-        Response containing the user's country based on their IP address.
-    """
+    """Determine the user's country based on their IP address."""
     request = Request(environ)
     response = Response(
         status=200,
@@ -40,10 +43,11 @@ def application(environ, start_response):
             function geoip_country_name() {{ return '{country_name}'; }}
         """.format(**geo_data)
     elif path == 'country.json':
-        response.content_type = 'application.json'
+        response.content_type = 'application/json'
         response.body = json.dumps(geo_data)
     else:
-        response.content_type = 'application.json'
+        response.status = 404
+        response.content_type = 'application/json'
         response.body = json.dumps({'error': 'Function not supported.'})
 
     return response(environ, start_response)

@@ -1,0 +1,14 @@
+import os
+
+
+ROOT = os.path.abspath(os.path.dirname(__file__))
+def path(*a):
+    return os.path.join(ROOT, *a)
+
+
+# Set to True if this is a local development instance.
+DEV = True
+
+# Absolute path to the geoip binary data file.
+GEO_DB_PATH = path('GeoIP.dat')
+

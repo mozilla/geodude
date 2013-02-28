@@ -2,9 +2,11 @@
 import argparse
 import gzip
 import inspect
+import sys
 from urllib import urlretrieve
 from wsgiref.simple_server import make_server
 
+import nose
 from webob import Request
 
 
@@ -73,6 +75,14 @@ def download_db():
     with gzip.open('GeoIP.dat.gz') as infile:
         with open('GeoIP.dat', 'w+b') as outfile:
             outfile.write(infile.read())
+
+
+@command
+def test():
+    """Run the test suite."""
+    argv = sys.argv
+    argv.pop(1)
+    nose.main(argv=argv)
 
 
 def main():
