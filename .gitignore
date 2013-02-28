@@ -1,0 +1,9 @@
+*.py[co]
+pip-log.txt
+build.py
+.DS_Store
+.noseids
+tmp/*
+*~
+*.egg-info
+GeoIP.dat*
