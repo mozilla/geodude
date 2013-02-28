@@ -1,4 +1,4 @@
-name: geoip
+name: geodude
 instances: 1
 framework:
   type: python
