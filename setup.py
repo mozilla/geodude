@@ -21,7 +21,7 @@ setup(
     name='geodude',
     description=("Small WSGI geolocation service that identifies the user's "
                  "country based on their IP address."),
-    long_description=read('README.rst'),
+    long_description=read('README.md'),
     version=find_version('geodude.py'),
     packages=find_packages(),
     author='Michael Kelly',
