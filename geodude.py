@@ -12,6 +12,8 @@ __version__ = '0.1'
 try:
     geoip = pygeoip.GeoIP(settings.GEO_DB_PATH, pygeoip.MEMORY_CACHE)
 except IOError, e:
+    # Re-raise if we're in prod. In dev mode we want to be able to run the tests
+    # without a geoip database.
     if not settings.DEV:
         raise IOError('Could not load GeoIP database: {0}'.format(e))
 

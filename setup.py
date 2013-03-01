@@ -28,7 +28,7 @@ setup(
     author_email='mkelly@mozilla.com',
     url='https://github.com/mozilla/geodude',
     license='Apache License v2.0',
-    install_requires=['pygeoip', 'WebOb'],
+    install_requires=['pygeoip==0.2.6', 'WebOb==1.2.3'],
     include_package_data=True,
     classifiers=[
         'Development Status :: 3 - Alpha',
