@@ -38,10 +38,6 @@ DEV = False
 GEO_DB_PATH = path('GeoIP.dat')
 SETTINGS
 
-echo "Downloading GeoIP database..."
-/usr/bin/env python manage.py download_db
-
-
 echo "Starting tests..."
 coverage run manage.py test
 coverage xml ./geodude.py
