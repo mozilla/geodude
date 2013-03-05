@@ -38,8 +38,8 @@ DEV = False
 GEO_DB_PATH = path('GeoIP.dat')
 SETTINGS
 
-echo "Download GeoIP database..."
-/usr/bin/env python manage.py install_db
+echo "Downloading GeoIP database..."
+/usr/bin/env python manage.py download_db
 
 
 echo "Starting tests..."
