@@ -22,7 +22,7 @@ fi
 source $VENV/bin/activate
 pip install -q -r requirements/dev.txt
 
-cat > settings/local.py <<SETTINGS
+cat > settings.py <<SETTINGS
 import os
 
 
