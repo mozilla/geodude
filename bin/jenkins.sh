@@ -39,7 +39,7 @@ GEO_DB_PATH = path('GeoIP.dat')
 SETTINGS
 
 echo "Download GeoIP database..."
-./geodude.py install_db
+/usr/bin/env python manage.py install_db
 
 
 echo "Starting tests..."
