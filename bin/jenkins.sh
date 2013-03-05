@@ -44,6 +44,5 @@ echo "Downloading GeoIP database..."
 
 echo "Starting tests..."
 coverage run manage.py test
-coverage xml $(find ./ -name 'geodude.py')
 
 echo "FIN"
