@@ -4,5 +4,6 @@
 
 -r prod.txt
 
+argparse
 nose
 mock
