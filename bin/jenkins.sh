@@ -44,5 +44,6 @@ echo "Downloading GeoIP database..."
 
 echo "Starting tests..."
 coverage run manage.py test
+coverage xml ./geodude.py
 
 echo "FIN"
