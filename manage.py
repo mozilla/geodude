@@ -85,9 +85,12 @@ def download_db():
     """Download MaxMind's free GeoLite Country database."""
     urlretrieve('http://geolite.maxmind.com/download/geoip/database/'
                 'GeoLiteCountry/GeoIP.dat.gz', 'GeoIP.dat.gz')
-    with gzip.open('GeoIP.dat.gz') as infile:
-        with open('GeoIP.dat', 'w+b') as outfile:
-            outfile.write(infile.read())
+
+    # `with` doesn't work with GzipFiles in Python 2.6. :(
+    infile = gzip.open('GeoIP.dat.gz')
+    with open('GeoIP.dat', 'w+b') as outfile:
+        outfile.write(infile.read())
+    infile.close()
 
 
 @command
