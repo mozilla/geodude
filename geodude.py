@@ -42,8 +42,7 @@ def application(environ, start_response):
         expires='02 Jan 2010 00:00:00 GMT',
     )
 
-    client_ip = request.headers.get('HTTP_X_CLUSTER_CLIENT_IP',
-                                    request.client_addr)
+    client_ip = request.headers.get('X-Cluster-Client-IP', request.client_addr)
     geo_data = {
         'country_code': geoip.country_code_by_addr(client_ip),
         'country_name': geoip.country_name_by_addr(client_ip),

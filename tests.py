@@ -52,7 +52,7 @@ def test_javascript_basic():
 
 def test_cluster_client_ip():
     response = request('/country.js',
-                       headers={'HTTP_X_CLUSTER_CLIENT_IP': '0.0.0.0'})
+                       headers={'X-Cluster-Client-IP': '0.0.0.0'})
 
     eq_(response.status, '200 OK')
     eq_(response.content_type, 'text/javascript')
