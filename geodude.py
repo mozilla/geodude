@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
+import os
+import sys
 
 import pygeoip
 from webob import Request, Response
 
+
+# Add current directory to path so we can import settings.
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 import settings
 
 
