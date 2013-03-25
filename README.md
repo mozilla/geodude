@@ -6,14 +6,14 @@ their IP address.
 
 ## Endpoints
 
-### `geo.mozilla.org/country.js`
+### /country.js
 
 ```javascript
 function geoip_country_code() { return 'US'; }
 function geoip_country_name() { return 'United States'; }
 ```
 
-## `geo.mozilla.org/country.json`
+### /country.json
 
 ```json
 {"country_name": "United States", "country_code": "US"}
