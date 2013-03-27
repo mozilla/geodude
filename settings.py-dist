@@ -12,3 +12,7 @@ DEV = True
 # Absolute path to the geoip binary data file.
 GEO_DB_PATH = path('GeoIP.dat')
 
+# Allow POSTing of arbitrary IPs to get their location. This setting can not be
+# enabled on public facing sites due to licensing restrictions on the MaxMind
+# dataset.
+ALLOW_POST = False

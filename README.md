@@ -6,6 +6,14 @@ their IP address.
 
 ## Endpoints
 
+Endpoints only return the visitors location unless you turn on `ALLOW_POST` in
+the settings. When that setting is enabled you can POST to the following
+endpoints with this body:
+
+```
+ip=0.0.0.0
+```
+
 ### /country.js
 
 ```javascript

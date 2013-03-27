@@ -77,3 +77,38 @@ def test_invalid_path():
     eq_(response.content_type, 'application/json')
     data = json.loads(response.body)
     eq_({'error': 'Function not supported.'}, data)
+
+
+def test_ip_post():
+    with patch('geodude.settings') as settings:
+        settings.ALLOW_POST = True
+        response = request('country.json', remote_addr='0.0.0.0',
+                           POST={'ip': '1.1.1.1'})
+
+        eq_(response.status, '200 OK')
+        eq_(response.content_type, 'application/json')
+        data = json.loads(response.body)
+        eq_({'country_code': 'fr', 'country_name': 'France'}, data)
+
+
+def test_post_without_ip():
+    with patch('geodude.settings') as settings:
+        settings.ALLOW_POST = True
+        response = request('country.json', remote_addr='0.0.0.0', POST={})
+
+        eq_(response.status, '400 Bad Request')
+        eq_(response.content_type, 'application/json')
+        data = json.loads(response.body)
+        eq_({'error': '`ip` required in POST body.'}, data)
+
+
+def test_ip_post_without_ALLOW_POST():
+    with patch('geodude.settings') as settings:
+        settings.ALLOW_POST = False
+        response = request('country.json', remote_addr='0.0.0.0',
+                           POST={'ip': '1.1.1.1'})
+
+        eq_(response.status, '200 OK')
+        eq_(response.content_type, 'application/json')
+        data = json.loads(response.body)
+        eq_({'country_code': 'us', 'country_name': 'United States'}, data)

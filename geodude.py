@@ -47,7 +47,15 @@ def application(environ, start_response):
         expires='02 Jan 2010 00:00:00 GMT',
     )
 
-    client_ip = request.headers.get('X-Cluster-Client-IP', request.client_addr)
+    if getattr(settings, 'ALLOW_POST', False) and request.method == 'POST':
+        if 'ip' in request.POST:
+            client_ip = request.POST['ip']
+        else:
+            response = error(response, 400, '`ip` required in POST body.')
+            return response(environ, start_response)
+    else:
+        client_ip = request.headers.get('X-Cluster-Client-IP',
+                                        request.client_addr)
     geo_data = {
         'country_code': geoip.country_code_by_addr(client_ip),
         'country_name': geoip.country_name_by_addr(client_ip),
@@ -65,8 +73,13 @@ def application(environ, start_response):
         response.content_type = 'application/json'
         response.body = json.dumps(geo_data)
     else:
-        response.status = 404
-        response.content_type = 'application/json'
-        response.body = json.dumps({'error': 'Function not supported.'})
+        response = error(response, 404, 'Function not supported.')
 
     return response(environ, start_response)
+
+
+def error(response, code, message):
+    response.status = code
+    response.content_type = 'application/json'
+    response.body = json.dumps({'error': message})
+    return response
