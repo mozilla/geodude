@@ -1,0 +1,22 @@
+SRC_DIR = ""
+WWW_DIR = ""
+
+REMOTE_WSGI = ""
+REMOTE_APP = ""
+REMOTE_UPDATE_SCRIPT = ""
+
+DEPLOY_SCRIPT = ""
+
+UPDATE_REF = 'origin/master'
+
+WEB_HOSTGROUP = "geo"
+
+SSH_KEY = "/path/to/key"
+
+GUNICORN = False
+
+VIRTUAL_ENV = '/path/to/venv'
+
+PYREPO = 'http://pyrepo1.addons.phx1.mozilla.com/'
+
+PYTHON = VIRTUAL_ENV + '/bin/python'
