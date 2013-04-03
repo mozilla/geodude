@@ -47,13 +47,6 @@ def update_info(ctx, ref='origin/master'):
 
 
 @task
-def update_geodb(ctx):
-    with ctx.lcd(settings.SRC_DIR):
-        ctx.local('%s manage.py download_db' % settings.PYTHON)
-        ctx.local('rm -f GeoIP.dat.gz')
-
-
-@task
 def checkin_changes(ctx):
     ctx.local(settings.DEPLOY_SCRIPT)
 
@@ -88,7 +81,6 @@ def deploy(ctx):
 def pre_update(ctx, ref=settings.UPDATE_REF):
     ctx.local('date')
     update_code(ref)
-    update_geodb()
     update_info(ref)
 
 
