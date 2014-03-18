@@ -13,31 +13,41 @@
 # limitations under the License.
 import json
 
+import pygeoip
 from mock import patch
 from nose.tools import eq_, ok_
 from webob import Request
 
-from geodude import application
+import geodude
+
+COUNTRY_DATA = {
+    '0.0.0.0': {'country_code': 'us', 'country_name': 'United States'},
+    '1.1.1.1': {'country_code': 'fr', 'country_name': 'France'},
+}
+
+MMDB_COUNTRY_DATA = {
+    '0.0.0.0': {
+        u'country': {
+            u'geoname_id': 6252001,
+            u'iso_code': u'US',
+            u'names': {u'fr': u'\xc9tats-Unis', u'en': u'United States'}}
+    },
+    '1.1.1.1': {
+        u'country': {
+            u'geoname_id': 3017382,
+            u'iso_code': u'FR',
+            u'names': {u'fr': u'France', u'en': u'France'}}
+    },
+}
+
+def fake_geo_data(ip):
+    return COUNTRY_DATA[ip]
 
 
-def request(path, country_data=None, **kwargs):
-    if country_data is None:
-        country_data = {
-            '0.0.0.0': {'code': 'us', 'name': 'United States'},
-            '1.1.1.1': {'code': 'fr', 'name': 'France'},
-        }
-
-    with patch('geodude.geoip') as geoip:
-        def country_code_by_addr(ip):
-            return country_data[ip]['code']
-        geoip.country_code_by_addr.side_effect = country_code_by_addr
-
-        def country_name_by_addr(ip):
-            return country_data[ip]['name']
-        geoip.country_name_by_addr.side_effect = country_name_by_addr
-
-        request = Request.blank(path, **kwargs)
-        return request.get_response(application)
+def request(path, allow_post=False, **kwargs):
+    app = geodude.make_application(fake_geo_data, allow_post)
+    request = Request.blank(path, **kwargs)
+    return request.get_response(app)
 
 
 def test_javascript_basic():
@@ -80,35 +90,61 @@ def test_invalid_path():
 
 
 def test_ip_post():
-    with patch('geodude.settings') as settings:
-        settings.ALLOW_POST = True
-        response = request('country.json', remote_addr='0.0.0.0',
-                           POST={'ip': '1.1.1.1'})
+    response = request('country.json', allow_post=True,
+                       remote_addr='0.0.0.0',
+                       POST={'ip': '1.1.1.1'})
 
-        eq_(response.status, '200 OK')
-        eq_(response.content_type, 'application/json')
-        data = json.loads(response.body)
-        eq_({'country_code': 'fr', 'country_name': 'France'}, data)
+    eq_(response.status, '200 OK')
+    eq_(response.content_type, 'application/json')
+    data = json.loads(response.body)
+    eq_({'country_code': 'fr', 'country_name': 'France'}, data)
 
 
 def test_post_without_ip():
-    with patch('geodude.settings') as settings:
-        settings.ALLOW_POST = True
-        response = request('country.json', remote_addr='0.0.0.0', POST={})
+    response = request('country.json', allow_post=True,
+                       remote_addr='0.0.0.0', POST={})
 
-        eq_(response.status, '400 Bad Request')
-        eq_(response.content_type, 'application/json')
-        data = json.loads(response.body)
-        eq_({'error': '`ip` required in POST body.'}, data)
+    eq_(response.status, '400 Bad Request')
+    eq_(response.content_type, 'application/json')
+    data = json.loads(response.body)
+    eq_({'error': '`ip` required in POST body.'}, data)
 
 
 def test_ip_post_without_ALLOW_POST():
-    with patch('geodude.settings') as settings:
-        settings.ALLOW_POST = False
-        response = request('country.json', remote_addr='0.0.0.0',
-                           POST={'ip': '1.1.1.1'})
+    response = request('country.json', allow_post=False,
+                       remote_addr='0.0.0.0',
+                       POST={'ip': '1.1.1.1'})
 
-        eq_(response.status, '200 OK')
-        eq_(response.content_type, 'application/json')
-        data = json.loads(response.body)
-        eq_({'country_code': 'us', 'country_name': 'United States'}, data)
+    eq_(response.status, '200 OK')
+    eq_(response.content_type, 'application/json')
+    data = json.loads(response.body)
+    eq_({'country_code': 'us', 'country_name': 'United States'}, data)
+
+
+def test_load_geoip():
+    with patch('pygeoip.GeoIP') as fake_GeoIP:
+        dbname = 'awesome_geoip.db'
+        ip = '1.1.1.1'
+        fetch = geodude.load_geoip(dbname)
+        fake_GeoIP.assert_called_with(dbname, pygeoip.MEMORY_CACHE)
+
+        ccba = fake_GeoIP.return_value.country_code_by_addr
+        ccna = fake_GeoIP.return_value.country_name_by_addr
+        ccba.return_value = 'fr'
+        ccna.return_value = 'France'
+        result = fetch(ip)
+        eq_(result['country_code'], 'fr')
+        eq_(result['country_name'], 'France')
+        ccba.assert_called_with(ip)
+        ccna.assert_called_with(ip)
+
+def test_load_mmdb():
+    with patch('maxminddb.Reader') as fake_Reader:
+        dbname = 'awesome.mmdb'
+        ip = '1.1.1.1'
+        fetch = geodude.load_mmdb(dbname)
+        fake_Reader.assert_called_with(dbname)
+        fake_Reader().get.side_effect = MMDB_COUNTRY_DATA.get
+        result = fetch(ip)
+        eq_(result['country_code'], 'fr')
+        eq_(result['country_name'], 'France')

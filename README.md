@@ -4,6 +4,12 @@ WSGI application that uses geolocation to determine visitors' countries based on
 their IP address.
 
 
+## Configuration
+
+Geodude supports either the GeoIP database format or Maxmind's MMDB
+format. Indicate which to use by setting `GEO_DB_FORMAT` in
+settings.py to either `'geoip'` or `'mmdb'`.
+
 ## Endpoints
 
 Endpoints only return the visitors location unless you turn on `ALLOW_POST` in

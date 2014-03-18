@@ -1,3 +1,5 @@
 WebOb==1.2.3
 gunicorn==0.17.2
 pygeoip==0.2.6
+ipaddr==2.1.11
+-e git+https://github.com/maxmind/MaxMind-DB-Reader-python.git@039a98130bac427c6dde4d7ee68b08592f65b573#egg=maxminddb

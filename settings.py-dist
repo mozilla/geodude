@@ -6,11 +6,11 @@ def path(*a):
     return os.path.join(ROOT, *a)
 
 
-# Set to True if this is a local development instance.
-DEV = True
-
 # Absolute path to the geoip binary data file.
 GEO_DB_PATH = path('GeoIP.dat')
+
+# Whether this is a 'geoip' format file or a MaxMind 'mmdb' format file.
+GEO_DB_FORMAT = 'geoip'
 
 # Allow POSTing of arbitrary IPs to get their location. This setting can not be
 # enabled on public facing sites due to licensing restrictions on the MaxMind
