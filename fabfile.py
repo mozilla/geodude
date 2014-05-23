@@ -1,0 +1,63 @@
+import os
+from fabric.api import (env, execute, lcd, local, parallel,
+                        run, roles, task)
+
+from fabdeploytools import helpers
+import fabdeploytools.envs
+
+import deploysettings as settings
+
+
+env.key_filename = settings.SSH_KEY
+fabdeploytools.envs.loadenv(settings.CLUSTER)
+
+ROOT, GEODUDE = helpers.get_app_dirs(__file__)
+
+VIRTUALENV = os.path.join(ROOT, 'venv')
+PYTHON = os.path.join(VIRTUALENV, 'bin', 'python')
+
+
+def managecmd(cmd):
+    with lcd(GEODUDE):
+        local('%s manage.py %s' % (PYTHON, cmd))
+
+
+@task
+def create_virtualenv():
+    helpers.create_venv(VIRTUALENV, settings.PYREPO,
+                        '%s/requirements/prod.txt' % GEODUDE,
+                        update_on_change=True, rm_first=True)
+
+
+@task
+def update_info(ref='origin/master'):
+    helpers.git_info(GEODUDE)
+    with lcd(GEODUDE):
+        local("/bin/bash -c "
+              "'source /etc/bash_completion.d/git && __git_ps1'")
+        local('git show -s {0} --pretty="format:%h" '
+              '> media/git-rev.txt'.format(ref))
+
+
+@task
+def deploy():
+    helpers.deploy(name='geodude',
+                   env=settings.ENV,
+                   cluster=settings.CLUSTER,
+                   domain=settings.DOMAIN,
+                   root=ROOT,
+                   package_dirs=['geodude', 'venv'])
+
+    helpers.restart_uwsgi(getattr(settings, 'UWSGI', []))
+
+
+@task
+def pre_update(ref=settings.UPDATE_REF):
+    local('date')
+    execute(helpers.git_update, GEODUDE, ref)
+    execute(update_info, ref)
+
+
+@task
+def update():
+    execute(create_virtualenv)
