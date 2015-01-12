@@ -89,6 +89,11 @@ the current directory to `GeoIP.dat`.
 
 Runs the test suite.
 
+## NewRelic Support
+
+A preconfigured `newrelic.ini` file is included. To enable NewRelic
+you need to set `NEW_RELIC_LICENSE_KEY` and `NEW_RELIC_APP_NAME` in
+the environment.
 
 ## License
 
