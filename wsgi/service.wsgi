@@ -10,8 +10,7 @@ except ImportError:
 application = load_geodude()
 
 # Add NewRelic
-newrelic_ini = environ.get('NEW_RELIC_CONFIG_FILE', 'newrelic.ini')
-newrelic_license_key = environ.get('NEW_RELIC_LICENSE_KEY', None)
-if newrelic_ini and newrelic_license_key:
+newrelic_ini = environ.get('NEWRELIC_PYTHON_INI_FILE', False)
+if newrelic_ini:
     newrelic.agent.initialize(newrelic_ini)
     application = newrelic.agent.wsgi_application()(application)
