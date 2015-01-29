@@ -15,6 +15,7 @@ ROOT, GEODUDE = helpers.get_app_dirs(__file__)
 
 VIRTUALENV = os.path.join(ROOT, 'venv')
 PYTHON = os.path.join(VIRTUALENV, 'bin', 'python')
+GEOIP_DB = '/usr/share/GeoIP/GeoIP2-City.mmdb'
 
 
 def managecmd(cmd):
@@ -40,6 +41,11 @@ def update_info(ref='origin/master'):
 
 
 @task
+def sync_geoipdb():
+    local('cp {0} {1}'.format(GEOIP_DB, GEODUDE))
+
+
+@task
 def deploy():
     helpers.deploy(name='geodude',
                    env=settings.ENV,
@@ -61,3 +67,23 @@ def pre_update(ref=settings.UPDATE_REF):
 @task
 def update():
     execute(create_virtualenv)
+
+
+@task
+def build():
+    execute(create_virtualenv)
+    execute(sync_geoipdb)
+
+
+@task
+def deploy_jenkins():
+    rpm = helpers.build_rpm(name='geodude',
+                            env=settings.ENV,
+                            cluster=settings.CLUSTER,
+                            domain=settings.DOMAIN,
+                            package_dirs=['geodude', 'venv'],
+                            root=ROOT)
+
+    rpm.local_install()
+    rpm.remote_install(['web'])
+    helpers.restart_uwsgi(getattr(settings, 'UWSGI', []))
